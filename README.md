@@ -66,6 +66,24 @@ npm run create-user -- admin your-password
 
 默认会根据访问协议决定 cookie 是否加 `Secure`。如果你放到 HTTPS 反向代理后面，也可以设置 `AUTH_COOKIE_SECURE=true` 强制启用。
 
+也可以创建临时 Token，通过 URL query 参数访问：
+
+```bash
+npm run token -- create guest 7
+```
+
+然后访问：
+
+```text
+http://localhost:3000/?token=<token>
+```
+
+删除临时 Token：
+
+```bash
+npm run token -- delete guest
+```
+
 ## 构建
 
 ```bash

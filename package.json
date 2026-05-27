@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "create-user": "node scripts/create-user.mjs",
+    "token": "node scripts/manage-token.mjs",
     "scan": "node scripts/scan-videos.mjs",
     "transcode": "node scripts/transcode-videos.mjs"
   },
