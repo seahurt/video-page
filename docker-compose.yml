@@ -1,0 +1,28 @@
+services:
+  video-page:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: nas-video-page:latest
+    container_name: nas-video-page
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      APP_TITLE: "${APP_TITLE:-NAS 视频}"
+      AUTH_COOKIE_SECURE: "${AUTH_COOKIE_SECURE:-false}"
+      SQLITE_PATH: /app/data/app.sqlite
+      VIDEO_ROOT: /videos
+    volumes:
+      - "${VIDEO_ROOT:-./videos}:/videos"
+      - "${SQLITE_DIR:-./.data}:/app/data"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "node -e \"require('http').get('http://127.0.0.1:3000/login', r => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))\""
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s

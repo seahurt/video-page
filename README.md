@@ -93,6 +93,30 @@ npm run build
 npm start
 ```
 
+## Docker 部署
+
+先在 `.env` 里配置宿主机视频目录：
+
+```bash
+VIDEO_ROOT=/Volumes/NAS/Movies
+APP_TITLE=NAS 视频
+PORT=3000
+```
+
+启动服务：
+
+```bash
+docker compose up -d --build
+```
+
+首次使用前在容器内创建登录账号：
+
+```bash
+docker compose exec video-page npm run create-user -- admin your-password
+```
+
+SQLite 数据默认挂载到项目的 `.data` 目录。视频目录会挂载到容器内 `/videos`，并需要可写权限，以便生成 `.thumb` 缩略图和 `.transcode` 转码缓存。
+
 ## 支持格式
 
 `.mp4`、`.mov`、`.m4v`、`.webm`、`.mkv`、`.avi`

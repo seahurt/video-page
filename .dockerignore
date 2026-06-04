@@ -1,0 +1,17 @@
+.cache
+.claude
+.data
+.git
+.next
+.DS_Store
+.env
+.env.*
+!.env.example
+dist
+node_modules
+npm-debug.log*
+videos
+*.sqlite
+*.sqlite-*
+Dockerfile
+docker-compose.yml
