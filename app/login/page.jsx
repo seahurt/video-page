@@ -11,7 +11,11 @@ export default async function LoginPage({ searchParams }) {
   if (user) redirect("/");
 
   const params = await searchParams;
-  const error = params?.error === "1";
+  const errorMessage = params?.error === "token"
+    ? "临时 Token 无效或已过期"
+    : params?.error === "1"
+      ? "账号或密码不正确"
+      : "";
 
   return (
     <main className="login-page">
@@ -33,7 +37,7 @@ export default async function LoginPage({ searchParams }) {
             <span>密码</span>
             <input name="password" type="password" autoComplete="current-password" required />
           </label>
-          {error && <p className="form-error">账号或密码不正确</p>}
+          {errorMessage && <p className="form-error">{errorMessage}</p>}
           <button type="submit">登录</button>
         </form>
       </section>

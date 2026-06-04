@@ -8,7 +8,7 @@
 - 按文件日期分组的相册视图
 - 点击日期相册里的视频后跳回全屏播放
 - 支持 Range 请求，拖动进度条时不会整段下载
-- 视频路径保存到 SQLite 数据库
+- 视频相对路径保存到 SQLite 数据库
 - 有 ffmpeg 时自动懒生成缩略图，缓存到视频根目录的 `.thumb`
 - 浏览器不支持原视频编码时，可预生成 H.264 兼容版本，缓存到视频根目录的 `.transcode`
 
@@ -40,7 +40,7 @@ http://localhost:3000
 npm run scan
 ```
 
-每次扫描会把当前视频文件全量同步到 SQLite 数据库；已删除或移动的视频会从数据库中移除。
+每次扫描会把当前视频文件同步到 SQLite 数据库；已删除或移动的视频会从数据库中移除，已有视频的转码状态会保留。
 
 如果有 HEVC/H.265 等浏览器不稳定支持的视频，先执行预转码：
 
@@ -62,7 +62,7 @@ npm run transcode -- --limit=10
 npm run create-user -- admin your-password
 ```
 
-账号、密码、session 和视频路径存在 SQLite 数据库里，默认路径是 `.data/app.sqlite`。可以通过 `SQLITE_PATH` 指定其他数据库文件。
+账号、密码、session 和视频相对路径存在 SQLite 数据库里，默认路径是 `.data/app.sqlite`。可以通过 `SQLITE_PATH` 指定其他数据库文件。
 
 默认会根据访问协议决定 cookie 是否加 `Secure`。如果你放到 HTTPS 反向代理后面，也可以设置 `AUTH_COOKIE_SECURE=true` 强制启用。
 
@@ -77,6 +77,8 @@ npm run token -- create guest 7
 ```text
 http://localhost:3000/?token=<token>
 ```
+
+首次访问时，服务端会把临时 Token 自动兑换成 12 小时的 httpOnly session cookie，并跳回不带 token 的首页。后续视频、缩略图和扫描接口都只走 cookie，不再把 token 拼进媒体 URL。
 
 删除临时 Token：
 

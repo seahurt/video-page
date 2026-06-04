@@ -14,7 +14,7 @@ const timeFormatter = new Intl.DateTimeFormat("zh-CN", {
   minute: "2-digit"
 });
 
-export default function VideoBrowser({ username, appTitle, accessToken = "" }) {
+export default function VideoBrowser({ username, appTitle }) {
   const [videos, setVideos] = useState([]);
   const [root, setRoot] = useState("");
   const [loading, setLoading] = useState(true);
@@ -28,7 +28,6 @@ export default function VideoBrowser({ username, appTitle, accessToken = "" }) {
 
   const groups = useMemo(() => groupByDay(videos), [videos]);
   const metaText = loading ? "正在加载视频..." : loadError || `${videos.length} 个视频 · ${root}`;
-  const apiUrl = useCallback((url) => appendAccessToken(url, accessToken), [accessToken]);
 
   const syncPlayback = useCallback(() => {
     for (const [index, video] of videoRefs.current.entries()) {
@@ -44,13 +43,13 @@ export default function VideoBrowser({ username, appTitle, accessToken = "" }) {
   const loadVideos = useCallback(async () => {
     setLoading(true);
     setLoadError("");
-    const response = await fetch(apiUrl("/api/videos"), { cache: "no-store" });
+    const response = await fetch("/api/videos", { cache: "no-store" });
     if (!response.ok) throw new Error(`加载失败: ${response.status}`);
     const data = await response.json();
-    setVideos(data.videos.map((video) => withAccessToken(video, accessToken)));
+    setVideos(data.videos);
     setRoot(data.root);
     setLoading(false);
-  }, [accessToken, apiUrl]);
+  }, []);
 
   const jumpToVideo = useCallback((index) => {
     const nextIndex = Math.max(0, Math.min(videos.length - 1, index));
@@ -64,7 +63,7 @@ export default function VideoBrowser({ username, appTitle, accessToken = "" }) {
   async function rescan() {
     setLoading(true);
     try {
-      const response = await fetch(apiUrl("/api/rescan"), { method: "POST" });
+      const response = await fetch("/api/rescan", { method: "POST" });
       if (!response.ok) throw new Error(`扫描失败: ${response.status}`);
       await loadVideos();
     } catch (error) {
@@ -248,22 +247,6 @@ export default function VideoBrowser({ username, appTitle, accessToken = "" }) {
       </section>
     </main>
   );
-}
-
-function withAccessToken(video, token) {
-  return {
-    ...video,
-    mediaUrl: appendAccessToken(video.mediaUrl, token),
-    originalMediaUrl: appendAccessToken(video.originalMediaUrl, token),
-    thumbUrl: appendAccessToken(video.thumbUrl, token),
-    transcodeUrl: appendAccessToken(video.transcodeUrl, token)
-  };
-}
-
-function appendAccessToken(url, token) {
-  if (!url || !token) return url;
-  const separator = url.includes("?") ? "&" : "?";
-  return `${url}${separator}token=${encodeURIComponent(token)}`;
 }
 
 function SlideMedia({ video, index, setVideoRef }) {
